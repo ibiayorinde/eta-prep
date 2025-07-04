@@ -287,13 +287,16 @@
 
                 calculateSDE() {
                     const netIncome = this.pnlData.netIncome;
+                    let currentTotalAddBacks = 0;
                     
-                    // Calculate totalAddBacks based on checked items
-                    this.totalAddBacks = this.pnl
-                        .filter(item => item.isAddBackOption && item.checked)
-                        .reduce((sum, item) => sum + item.addBackValue, 0);
+                    // Iterate through the pnl items to sum up checked add-backs
+                    this.pnl.forEach(item => {
+                        if (item.isAddBackOption && item.checked) {
+                            currentTotalAddBacks += item.addBackValue;
+                        }
+                    });
 
-                    // SDE is simply Net Income plus all identified and checked add-backs
+                    this.totalAddBacks = currentTotalAddBacks;
                     this.calculatedSDE = netIncome + this.totalAddBacks;
                 },
 
