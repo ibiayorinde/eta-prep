@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to Seller's Discretionary Earnings (SDE)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Slate & Muted Blue -->
+    <!-- Application Structure Plan: A three-part, single-page application guiding the user through the 'Why', 'What', and 'How' of SDE. The structure begins with conceptual understanding, moves to definitions and components, and culminates in a hands-on interactive calculator. This task-oriented flow was chosen to mirror the learning process, starting with theory and progressively building to practical application, which is more effective for skill acquisition than a static Q&A format. Key interactions include an 'Add-Backs Explorer' and the dynamic 'SDE Calculator' that updates charts in real-time. -->
+    <!-- Visualization & Content Choices: The SDE assessment content is transformed into an interactive learning experience. 
+        - Report Info: Strategic Importance (Q1-3) -> Goal: Inform -> Presentation: Accordion component for stakeholder perspectives -> Interaction: Click to reveal -> Justification: Breaks down complex ideas into digestible, user-controlled chunks.
+        - Report Info: Definitions & Components (Q4-8) -> Goal: Organize & Compare -> Presentation: Tabbed interface for SDE vs. EBITDA/Net Income and an interactive card grid for exploring Add-Backs -> Interaction: Click to toggle/reveal -> Justification: Allows direct comparison and focused exploration of individual concepts.
+        - Report Info: P&L Statement & Calculations (Q9-15) -> Goal: Apply & Analyze -> Presentation: An interactive P&L table with checkboxes connected to a dynamic SDE calculation and two bar charts (Chart.js) -> Interaction: Checking boxes recalculates SDE and updates charts in real-time. A slider adjusts the valuation multiple. -> Justification: Provides immediate, visual feedback, demonstrating the cause-and-effect relationship between add-backs, SDE, and business valuation. This is the most effective way to teach the practical application. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .section-title {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 700;
+            color: #1e293b; /* slate-800 */
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .section-intro {
+            text-align: center;
+            max-width: 48rem; /* max-w-3xl */
+            margin: 0 auto 3rem auto;
+            color: #475569; /* slate-600 */
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            transition: background-color 0.2s ease-in-out;
+            color: #334155; /* slate-700 */
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            background-color: #e2e8f0; /* slate-200 */
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body x-data="sdeApp()" class="text-slate-700">
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-slate-800">SDE Interactive Guide</h1>
+                </div>
+                <div class="hidden md:flex md:space-x-4">
+                    <a href="#why" class="nav-link">Why SDE Matters</a>
+                    <a href="#what" class="nav-link">What Is SDE?</a>
+                    <a href="#how" class="nav-link">SDE in Practice</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <!-- Section 1: Why SDE Matters -->
+        <section id="why" class="py-16">
+            <h2 class="section-title">Why SDE Matters</h2>
+            <p class="section-intro">
+                Before diving into calculations, it's crucial to understand the strategic importance of Seller's Discretionary Earnings. SDE is the language of small business valuation, providing a standardized way to view profitability from the perspective of a single owner-operator. This section explores its role for different players in an acquisition.
+            </p>
+            <div class="space-y-4 max-w-4xl mx-auto">
+                <div x-data="{ open: false }" class="bg-white rounded-lg shadow-md">
+                    <button @click="open = !open" class="w-full flex justify-between items-center p-4 font-semibold text-lg text-slate-800">
+                        <span>The Buyer's Perspective</span>
+                        <svg :class="{'rotate-180': open}" class="w-5 h-5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div x-show="open" x-cloak x-transition class="p-4 border-t text-slate-600">
+                        <p>For a prospective owner-operator, SDE is the most important number. It answers the question: "After paying all necessary business expenses, how much cash would this business generate for me to live on?" It normalizes earnings by adding back the current owner's salary and personal perks, providing a true 'apples-to-apples' comparison between different acquisition opportunities and revealing the business's full potential cash flow to a new owner.</p>
+                    </div>
+                </div>
+                <div x-data="{ open: false }" class="bg-white rounded-lg shadow-md">
+                    <button @click="open = !open" class="w-full flex justify-between items-center p-4 font-semibold text-lg text-slate-800">
+                        <span>The Seller's Perspective</span>
+                        <svg :class="{'rotate-180': open}" class="w-5 h-5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div x-show="open" x-cloak x-transition class="p-4 border-t text-slate-600">
+                        <p>A seller uses SDE to maximize the perceived value of their business. Many small business owners run personal expenses through the company to minimize their tax burden, which artificially lowers Net Income. By meticulously identifying and documenting legitimate "add-backs," a seller can present a much higher SDE, justifying a higher asking price and showing buyers the true profitability of the enterprise.</p>
+                    </div>
+                </div>
+                <div x-data="{ open: false }" class="bg-white rounded-lg shadow-md">
+                    <button @click="open = !open" class="w-full flex justify-between items-center p-4 font-semibold text-lg text-slate-800">
+                        <span>The Broker's Perspective</span>
+                        <svg :class="{'rotate-180': open}" class="w-5 h-5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div x-show="open" x-cloak x-transition class="p-4 border-t text-slate-600">
+                        <p>Business brokers rely on SDE as a standardized metric for marketing and valuing small to medium-sized businesses. It creates a common language between buyers and sellers and forms the basis for applying industry-standard valuation multiples. Using SDE allows a broker to efficiently package a business for sale and defend its valuation during negotiations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: What is SDE -->
+        <section id="what" class="py-16 bg-slate-100 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+            <h2 class="section-title">What Is SDE? Components & Definitions</h2>
+            <p class="section-intro">
+                SDE is calculated by taking a business's pre-tax earnings and adding back specific items. Understanding what qualifies as an "add-back" is the key to accurately calculating SDE. This section breaks down the core components and helps you differentiate SDE from other common financial metrics.
+            </p>
+            <div class="max-w-4xl mx-auto">
+                <div class="card mb-12">
+                     <h3 class="text-xl font-bold text-center text-slate-800 mb-2">Seller's Discretionary Earnings (SDE)</h3>
+                    <p class="text-center text-slate-600">SDE represents the total financial benefit a single full-time owner-operator would derive from a business on an annual basis. It is calculated before interest, taxes, non-cash expenses, one owner's compensation, and discretionary items.</p>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-center text-slate-800 mb-8">The "Add-Backs" Explorer</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card text-center">
+                        <h4 class="font-bold text-lg text-blue-600 mb-2">Owner's Salary</h4>
+                        <p>The compensation the current owner pays themselves. This is added back because a new owner will set their own salary.</p>
+                    </div>
+                    <div class="card text-center">
+                        <h4 class="font-bold text-lg text-blue-600 mb-2">Discretionary Expenses</h4>
+                        <p>Personal expenses run through the business, like personal car leases or family travel, that are not essential for operations.</p>
+                    </div>
+                    <div class="card text-center">
+                        <h4 class="font-bold text-lg text-blue-600 mb-2">Non-Recurring Expenses</h4>
+                        <p>One-time costs, like a major lawsuit settlement or a unique repair, that are not expected to occur again.</p>
+                    </div>
+                    <div class="card text-center">
+                        <h4 class="font-bold text-lg text-blue-600 mb-2">Non-Cash Expenses</h4>
+                        <p>Expenses like depreciation and amortization that reduce taxable income but don't represent an actual cash outlay.</p>
+                    </div>
+                    <div class="card text-center">
+                        <h4 class="font-bold text-lg text-blue-600 mb-2">Interest Expense</h4>
+                        <p>Added back because a new owner will have a different debt structure. SDE reflects the business's performance independent of its financing.</p>
+                    </div>
+                     <div class="card text-center">
+                        <h4 class="font-bold text-lg text-blue-600 mb-2">Related Party Perks</h4>
+                        <p>Salaries or benefits paid to family members for minimal work, or above-market rent paid to a property owned by the seller.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: SDE in Practice -->
+        <section id="how" class="py-16">
+            <h2 class="section-title">SDE in Practice: The Interactive Calculator</h2>
+            <p class="section-intro">
+                Now let's apply this knowledge. Below is a simplified P&L statement for "The Daily Grind," a local coffee shop. Check the boxes for items you believe are legitimate SDE "add-backs" to see how they impact the final SDE calculation and business valuation in real-time.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start max-w-7xl mx-auto">
+                <!-- P&L and Calculator -->
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-slate-800">The Daily Grind - P&L Statement</h3>
+                    <table class="w-full text-sm">
+                        <tbody>
+                            <template x-for="(item, index) in pnl" :key="index">
+                                <tr :class="{'font-bold text-slate-800 bg-slate-50': item.isHeader, 'border-t border-slate-200': !item.isHeader}">
+                                    <td class="p-2 flex items-center">
+                                        <input x-if="item.isAddBackOption" type="checkbox" :id="'addback-' + index" x-model="item.checked" @change="calculateSDE" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-3">
+                                        <label :for="'addback-' + index" x-text="item.label" :class="{'pl-7': !item.isAddBackOption}"></label>
+                                    </td>
+                                    <td class="p-2 text-right" x-text="formatCurrency(item.amount)"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Results and Charts -->
+                <div class="space-y-8">
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-4 text-slate-800">SDE Calculation & Results</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Net Income:</span>
+                                <span class="font-mono" x-text="formatCurrency(pnlData.netIncome)"></span>
+                            </div>
+                            <div class="flex justify-between items-center text-green-600">
+                                <span class="font-semibold">Total Add-Backs:</span>
+                                <span class="font-mono font-bold" x-text="formatCurrency(totalAddBacks)"></span>
+                            </div>
+                            <hr class="my-2"/>
+                            <div class="flex justify-between items-center text-xl font-bold text-blue-600">
+                                <span>Calculated SDE:</span>
+                                <span class="font-mono" x-text="formatCurrency(calculatedSDE)"></span>
+                            </div>
+                        </div>
+                         <div class="mt-6">
+                            <h4 class="font-bold text-lg mb-2">Profitability Comparison</h4>
+                            <div class="chart-container">
+                                <canvas id="sdeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-4 text-slate-800">Valuation Estimator</h3>
+                        <div>
+                            <label for="valuationMultiple" class="block font-semibold mb-2">Valuation Multiple: <span x-text="valuationMultiple + 'x'" class="font-bold text-blue-600"></span></label>
+                            <input type="range" id="valuationMultiple" x-model="valuationMultiple" min="2" max="5" step="0.25" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div class="mt-4 text-xl font-bold text-green-700 text-center">
+                            <span>Estimated Valuation: </span>
+                            <span class="font-mono" x-text="formatCurrency(calculatedSDE * valuationMultiple)"></span>
+                        </div>
+                        <div class="mt-6">
+                            <h4 class="font-bold text-lg mb-2">Impact of Missing an Add-Back</h4>
+                            <p class="text-sm text-slate-600 mb-2">Notice how overlooking even one add-back, like the <strong x-text="pnl.find(i => i.id === 'car').label"></strong>, would reduce the valuation by <strong x-text="formatCurrency(pnl.find(i => i.id === 'car').amount * valuationMultiple)"></strong> at the current multiple.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const pnlData = {
+            netIncome: 77175,
+            items: [
+                { label: 'Revenue', amount: 600000, isHeader: true },
+                { label: 'Cost of Goods Sold (COGS)', amount: -180000 },
+                { label: 'Gross Profit', amount: 420000, isHeader: true },
+                { label: 'Salaries & Wages (Non-Owner)', amount: -120000 },
+                { label: 'Rent', amount: -36000 },
+                { label: 'Utilities', amount: -12000 },
+                { label: 'Marketing & Advertising', amount: -15000 },
+                { id: 'salary', label: "Owner's Salary", amount: -80000, isAddBackOption: true, checked: true, addBackValue: 80000 },
+                { id: 'car', label: "Owner's Personal Car Lease", amount: -9600, isAddBackOption: true, checked: true, addBackValue: 9600 },
+                { id: 'dep', label: 'Depreciation & Amortization', amount: -10000, isAddBackOption: true, checked: true, addBackValue: 10000 },
+                { id: 'legal', label: 'One-time Legal Fees', amount: -7500, isAddBackOption: true, checked: true, addBackValue: 7500 },
+                { id: 'travel', label: 'Travel & Entertainment (Personal)', amount: -18000, isAddBackOption: true, checked: true, addBackValue: 18000 },
+                { label: 'Miscellaneous Office Supplies', amount: -5000 },
+                { label: 'Operating Income (EBIT)', amount: 106900, isHeader: true },
+                { id: 'interest', label: 'Interest Expense', amount: -4000, isAddBackOption: true, checked: true, addBackValue: 4000 },
+                { label: 'Net Income Before Taxes', amount: 102900, isHeader: true },
+                { id: 'tax', label: 'Income Tax Expense', amount: -25725, isAddBackOption: true, checked: true, addBackValue: 25725 },
+                { label: 'Net Income', amount: 77175, isHeader: true },
+            ]
+        };
+
+        function sdeApp() {
+            return {
+                pnlData: pnlData,
+                pnl: JSON.parse(JSON.stringify(pnlData.items)), // Deep copy for reactivity
+                totalAddBacks: 0,
+                calculatedSDE: 0,
+                valuationMultiple: 3.0,
+                sdeChart: null,
+
+                init() {
+                    // Defer chart creation and initial SDE calculation to ensure DOM is ready
+                    this.$nextTick(() => {
+                        this.calculateSDE();
+                        this.createChart();
+                        this.$watch('calculatedSDE', () => this.updateChart());
+                    });
+                },
+                
+                formatCurrency(value) {
+                    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+                },
+
+                calculateSDE() {
+                    const netIncome = this.pnlData.netIncome;
+                    
+                    // Calculate totalAddBacks based on checked items
+                    this.totalAddBacks = this.pnl
+                        .filter(item => item.isAddBackOption && item.checked)
+                        .reduce((sum, item) => sum + item.addBackValue, 0);
+
+                    // SDE is simply Net Income plus all identified and checked add-backs
+                    this.calculatedSDE = netIncome + this.totalAddBacks;
+                },
+
+                createChart() {
+                    const ctx = document.getElementById('sdeChart').getContext('2d');
+                    this.sdeChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Net Income', 'Operating Income (EBIT)', 'Seller\'s Discretionary Earnings (SDE)'],
+                            datasets: [{
+                                label: 'Profitability ($)',
+                                data: [this.pnlData.netIncome, 106900, this.calculatedSDE],
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.5)',
+                                    'rgba(54, 162, 235, 0.5)',
+                                    'rgba(75, 192, 192, 0.5)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(75, 192, 192, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(context.raw);
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value, index, values) {
+                                            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact' }).format(value);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                updateChart() {
+                    if (this.sdeChart) {
+                        this.sdeChart.data.datasets[0].data[2] = this.calculatedSDE;
+                        this.sdeChart.update();
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</body>
+</html>
