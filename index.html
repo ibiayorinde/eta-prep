@@ -291,16 +291,17 @@
                 <template x-for="(q, qIndex) in quizQuestions" :key="qIndex">
                     <div class="card">
                         <p class="font-semibold text-lg mb-4 text-slate-800" x-text="`${qIndex + 1}. ${q.question}`"></p>
-                        <div class="space-y-2">
+                        <div class="space-y-2 min-h-16"> {{-- Added min-h-16 --}}
                             <template x-for="(option, oIndex) in q.options" :key="oIndex">
-                                <label class="flex items-center p-3 rounded-lg cursor-pointer transition-colors duration-200"
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer transition-colors duration-200 border border-slate-200 bg-white hover:bg-slate-50"
                                     :class="{
                                         'bg-blue-50 text-blue-800': q.selectedAnswerIndex === oIndex && !quizSubmitted,
                                         'bg-green-50 text-green-800 font-medium': quizSubmitted && q.correctAnswerIndex === oIndex,
                                         'bg-red-50 text-red-800 font-medium': quizSubmitted && q.selectedAnswerIndex === oIndex && q.selectedAnswerIndex !== q.correctAnswerIndex,
-                                        'hover:bg-slate-50': !quizSubmitted
-                                    }">
-                                    <input type="radio" :name="`question-${qIndex}`" :value="oIndex" x-model="q.selectedAnswerIndex" :disabled="quizSubmitted" class="mr-3">
+                                    }"
+                                    :for="`quiz-question-${qIndex}-${oIndex}`"
+                                >
+                                    <input type="radio" :name="`question-${qIndex}`" :id="`quiz-question-${qIndex}-${oIndex}`" :value="oIndex" x-model="q.selectedAnswerIndex" :disabled="quizSubmitted" class="mr-3">
                                     <span x-text="option"></span>
                                 </label>
                             </template>
@@ -397,16 +398,17 @@
                 <template x-for="(q, qIndex) in quantitativeQuestions" :key="qIndex">
                     <div class="card">
                         <p class="font-semibold text-lg mb-3 text-slate-800" x-text="`${qIndex + 1}. ${q.question}`"></p>
-                        <div class="space-y-2">
+                        <div class="space-y-2 min-h-16"> {{-- Added min-h-16 --}}
                             <template x-for="(option, oIndex) in q.options" :key="oIndex">
-                                <label class="flex items-center p-3 rounded-lg cursor-pointer transition-colors duration-200"
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer transition-colors duration-200 border border-slate-200 bg-white hover:bg-slate-50"
                                     :class="{
                                         'bg-blue-50 text-blue-800': q.selectedAnswerIndex === oIndex && !quizSubmitted,
                                         'bg-green-50 text-green-800 font-medium': quizSubmitted && q.correctAnswerIndex === oIndex,
                                         'bg-red-50 text-red-800 font-medium': quizSubmitted && q.selectedAnswerIndex === oIndex && q.selectedAnswerIndex !== q.correctAnswerIndex,
-                                        'hover:bg-slate-50': !quizSubmitted
-                                    }">
-                                    <input type="radio" :name="`quantitative-question-${qIndex}`" :value="oIndex" x-model="q.selectedAnswerIndex" :disabled="quizSubmitted" class="mr-3">
+                                    }"
+                                    :for="`quantitative-question-${qIndex}-${oIndex}`"
+                                >
+                                    <input type="radio" :name="`quantitative-question-${qIndex}`" :id="`quantitative-question-${qIndex}-${oIndex}`" :value="oIndex" x-model="q.selectedAnswerIndex" :disabled="quizSubmitted" class="mr-3">
                                     <span x-text="option"></span>
                                 </label>
                             </template>
@@ -537,6 +539,104 @@
                 showExpertModal: false, // New property for expert modal visibility
                 showWelcomeOverlay: false, // Control for welcome overlay
                 
+                quizQuestions: [
+                    {
+                        question: "Why is Seller's Discretionary Earnings (SDE) often preferred over Net Income for valuing small, owner-operated businesses?",
+                        options: [
+                            "SDE is a GAAP-compliant metric for all business sizes.",
+                            "SDE provides a clearer picture of the total economic benefit to a single owner-operator.",
+                            "Net Income includes too many non-cash expenses, making it less reliable.",
+                            "SDE is solely used by sellers to inflate their business value."
+                        ],
+                        correctAnswerIndex: 1,
+                        selectedAnswerIndex: null,
+                        explanation: "SDE normalizes earnings to show the total cash flow available to a single owner-operator, accounting for discretionary expenses and owner compensation that obscure true profitability in Net Income for small businesses."
+                    },
+                    {
+                        question: "Which of the following would be considered a legitimate 'add-back' when calculating SDE?",
+                        options: [
+                            "Regular employee salaries and wages.",
+                            "Cost of goods sold.",
+                            "The owner's personal car payment expensed through the business.",
+                            "Monthly rent for the business premises."
+                        ],
+                        correctAnswerIndex: 2,
+                        selectedAnswerIndex: null,
+                        explanation: "The owner's personal car payment, if expensed through the business, is a discretionary item that would not be incurred by a new owner, hence it's added back to SDE."
+                    },
+                    {
+                        question: "A business incurs a significant, one-time legal fee for defending a lawsuit unrelated to its core operations. How would this expense typically be treated in an SDE calculation?",
+                        options: [
+                            "It would be subtracted from Net Income as a normal operating expense.",
+                            "It would be ignored entirely as it's not a recurring cost.",
+                            "It would be added back to Net Income as a non-recurring expense.",
+                            "It would be capitalized as an asset."
+                        ],
+                        correctAnswerIndex: 2,
+                        selectedAnswerIndex: null,
+                        explanation: "One-time, non-recurring expenses like a lawsuit settlement are added back to SDE to show the normalized, ongoing profitability of the business."
+                    },
+                    {
+                        question: "If a business has a Net Income of $100,000, and the owner's salary (expensed through the business) is $70,000, with no other add-backs, what is the SDE?",
+                        options: [
+                            "$30,000",
+                            "$100,000",
+                            "$170,000",
+                            "$240,000"
+                        ],
+                        correctAnswerIndex: 2,
+                        selectedAnswerIndex: null,
+                        explanation: "SDE = Net Income + Owner's Salary = $100,000 + $70,000 = $170,000. Owner's salary is a primary add-back."
+                    },
+                    {
+                        question: "A business has an SDE of $200,000. If comparable businesses in the industry are selling for a 3x SDE multiple, what is the estimated valuation of this business?",
+                        options: [
+                            "$200,000",
+                            "$400,000",
+                            "$600,000",
+                            "$800,000"
+                        ],
+                        correctAnswerIndex: 2,
+                        selectedAnswerIndex: null,
+                        explanation: "Estimated Valuation = SDE × Multiple = $200,000 × 3 = $600,000."
+                    },
+                    {
+                        question: "Which of the following statements best describes the purpose of 'discretionary expenses' as an SDE add-back?",
+                        options: [
+                            "To account for all operational costs of the business.",
+                            "To include all non-cash expenses like depreciation.",
+                            "To normalize earnings by removing costs that a new owner would not necessarily incur.",
+                            "To reduce the taxable income of the business."
+                        ],
+                        correctAnswerIndex: 2,
+                        selectedAnswerIndex: null,
+                        explanation: "Discretionary expenses are added back to remove costs that are personal to the current owner and would not be part of the business's ongoing operations under a new owner, thereby normalizing earnings."
+                    }
+                ],
+                quantitativeQuestions: [
+                    {
+                        question: "Using The Daily Grind's P&L, if the 'Owner's Salary' ($80,000) was *incorrectly* NOT added back to SDE (while all other default add-backs remain), what would be the resulting SDE?",
+                        options: ["Option A", "Option B", "Option C", "Option D"], // Dummy options
+                        correctAnswerIndex: null,
+                        selectedAnswerIndex: null,
+                        explanation: ""
+                    },
+                    {
+                        question: "Given the current 'Calculated SDE' and 'Valuation Multiple' in the calculator above, if you *mistakenly* added back a non-discretionary expense of $10,000 (e.g., regular employee training), how much would this *incorrectly* inflate the estimated valuation?",
+                        options: ["Option A", "Option B", "Option C", "Option D"], // Dummy options
+                        correctAnswerIndex: null,
+                        selectedAnswerIndex: null,
+                        explanation: ""
+                    },
+                    {
+                        question: "If 'The Daily Grind' had no owner's salary, no personal car lease, and no personal travel expenses, but all other default add-backs (Depreciation, Legal Fees, Interest) were valid, what would be the SDE?",
+                        options: ["Option A", "Option B", "Option C", "Option D"], // Dummy options
+                        correctAnswerIndex: null,
+                        selectedAnswerIndex: null,
+                        explanation: ""
+                    }
+                ],
+
                 init() {
                     // Check local storage to see if the welcome overlay has been seen
                     if (localStorage.getItem('hasSeenWelcome') !== 'true') {
@@ -726,6 +826,13 @@
                 hideWelcomeOverlay() {
                     this.showWelcomeOverlay = false;
                     localStorage.setItem('hasSeenWelcome', 'true');
+                    // Scroll to the first quiz section after dismissing the welcome overlay
+                    this.$nextTick(() => {
+                        const quizSection = document.getElementById('quiz');
+                        if (quizSection) {
+                            quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    });
                 }
             }
         }
