@@ -657,13 +657,9 @@
                 ],
 
                 init() {
-                    // Check local storage to see if the welcome overlay has been seen
-                    if (localStorage.getItem('hasSeenWelcome') === 'true') {
-                        this.showWelcomeOverlay = false; // Hide if already seen
-                    } else {
-                        this.showWelcomeOverlay = true; // Show if not seen
-                        this.welcomeSlide = 1; // Ensure it starts on the first slide
-                    }
+                    // Always show the welcome overlay on init, regardless of local storage.
+                    this.showWelcomeOverlay = true;
+                    this.welcomeSlide = 1; // Ensure it starts on the first slide
 
                     this.$nextTick(() => {
                         this.calculateSDE();
@@ -847,7 +843,7 @@
                 // New function to hide the welcome overlay and set local storage
                 hideWelcomeOverlay() {
                     this.showWelcomeOverlay = false;
-                    localStorage.setItem('hasSeenWelcome', 'true');
+                    // Removed localStorage.setItem('hasSeenWelcome', 'true');
                 },
                 // New function to advance welcome slide
                 nextWelcomeSlide() {
