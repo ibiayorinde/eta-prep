@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Slate & Muted Blue -->
-    <!-- Application Structure Plan: A three-part, single-page application guiding the user through the 'Why', 'What', and 'How' of SDE, now augmented with a 'Knowledge Check' quiz and in-context quantitative questions. The structure begins with conceptual understanding, moves to definitions and components, includes a quiz for self-assessment, and culminates in a hands-on interactive calculator with integrated application questions. This task-oriented flow was chosen to mirror the learning process, starting with theory and progressively building to practical application, which is more effective for skill acquisition than a static Q&A format. Key interactions include an 'Add-Backs Explorer', the dynamic 'SDE Calculator' that updates charts in real-time, interactive quiz questions with immediate feedback, and new quantitative questions within the calculator section. -->
+    <!-- Application Structure Plan: A three-part, single-page application guiding the user through the 'Why', 'What', and 'How' of SDE, now augmented with a 'Knowledge Check' quiz and in-context quantitative questions. The structure begins with conceptual understanding, moves to definitions and components, includes a quiz for self-assessment, and culminates in a hands-on interactive calculator with integrated application application questions. This task-oriented flow was chosen to mirror the learning process, starting with theory and progressively building to practical application, which is more effective for skill acquisition than a static Q&A format. Key interactions include an 'Add-Backs Explorer', the dynamic 'SDE Calculator' that updates charts in real-time, interactive quiz questions with immediate feedback, and new quantitative questions within the calculator section. -->
     <!-- Visualization & Content Choices: The SDE assessment content is transformed into an interactive learning experience. 
         - Report Info: Strategic Importance (Q1-3) -> Goal: Inform -> Presentation: Accordion component for stakeholder perspectives -> Interaction: Click to reveal -> Justification: Breaks down complex ideas into digestible, user-controlled chunks.
         - Report Info: Definitions & Components (Q4-8) -> Goal: Organize & Compare -> Presentation: Tabbed interface for SDE vs. EBITDA/Net Income and an interactive card grid for exploring Add-Backs -> Interaction: Click to toggle/reveal -> Justification: Allows direct comparison and focused exploration of individual concepts.
@@ -133,6 +133,44 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* blue-500 with opacity */
         }
+
+        /* Overlay styles */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .overlay-content {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            position: relative;
+        }
+        .overlay-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b; /* slate-500 */
+            transition: color 0.2s ease;
+        }
+        .overlay-close-button:hover {
+            color: #1e293b; /* slate-800 */
+        }
     </style>
 </head>
 <body x-data="sdeApp()" class="text-slate-700">
@@ -147,6 +185,7 @@
                     <a href="#what" class="nav-link">What Is SDE?</a>
                     <a href="#quiz" class="nav-link">Knowledge Check</a>
                     <a href="#how" class="nav-link">SDE in Practice</a>
+                    <button @click="showExpertModal = true" class="nav-link">Meet Our Expert</button>
                 </div>
             </div>
         </nav>
@@ -187,6 +226,15 @@
                     <div x-show="open" x-cloak x-transition class="p-4 border-t border-slate-100 text-slate-600">
                         <p>Business brokers rely on SDE as a standardized metric for marketing and valuing small to medium-sized businesses. It creates a common language between buyers and sellers and forms the basis for applying industry-standard valuation multiples. Using SDE allows a broker to efficiently package a business for sale and defend its valuation during negotiations.</p>
                     </div>
+                </div>
+
+                <!-- Expert Quote Section -->
+                <div class="card bg-blue-50 border border-blue-200 text-center p-6 mt-8">
+                    <img src="https://cloudinary.hbs.edu/hbsit/image/fetch/q_auto,c_fill,ar_1:1,g_west/f_webp/https%3A%2F%2Fimages.ctfassets.net%2Fbeh2ph2tgbqk%2F1yivGJqvZoXH8FZka0FpDZ%2F95d2c1d242b4697de385391b97679f3d%2Fsasael.jpg" alt="Emily Reed, CPA, MBA" class="rounded-full mx-auto mb-4 border-4 border-blue-300 shadow-lg w-24 h-24 object-cover">
+                    <p class="text-xl italic text-blue-800 mb-4">
+                        "For anyone pursuing an acquisition, accurately analyzing SDE isn't just about understanding profitability—it's about due diligence. An incorrect assessment of SDE can lead to a significant overvaluation, turning a promising investment into a costly mistake. Conversely, a precise SDE analysis reveals the true earning power, unlocking genuine opportunities for growth and value creation."
+                    </p>
+                    <p class="font-semibold text-blue-700">- Emily Reed, CPA, MBA</p>
                 </div>
             </div>
         </section>
@@ -247,50 +295,27 @@
                             <template x-for="(option, oIndex) in q.options" :key="oIndex">
                                 <label class="flex items-center p-3 rounded-lg cursor-pointer transition-colors duration-200"
                                     :class="{
-                                        'bg-blue-50 text-blue-800': q.selectedAnswerIndex === oIndex && !q.isAnswered,
-                                        'bg-green-50 text-green-800 font-medium': q.isAnswered && q.correctAnswerIndex === oIndex,
-                                        'bg-red-50 text-red-800 font-medium': q.isAnswered && q.selectedAnswerIndex === oIndex && q.selectedAnswerIndex !== q.correctAnswerIndex,
-                                        'hover:bg-slate-50': !q.isAnswered
+                                        'bg-blue-50 text-blue-800': q.selectedAnswerIndex === oIndex && !quizSubmitted,
+                                        'bg-green-50 text-green-800 font-medium': quizSubmitted && q.correctAnswerIndex === oIndex,
+                                        'bg-red-50 text-red-800 font-medium': quizSubmitted && q.selectedAnswerIndex === oIndex && q.selectedAnswerIndex !== q.correctAnswerIndex,
+                                        'hover:bg-slate-50': !quizSubmitted
                                     }">
-                                    <input type="radio" :name="`question-${qIndex}`" :value="oIndex" x-model="q.selectedAnswerIndex" :disabled="q.isAnswered" class="mr-3">
+                                    <input type="radio" :name="`question-${qIndex}`" :value="oIndex" x-model="q.selectedAnswerIndex" :disabled="quizSubmitted" class="mr-3">
                                     <span x-text="option"></span>
                                 </label>
                             </template>
                         </div>
-                        <div class="mt-6 flex justify-between items-center">
-                            <button @click="checkAnswer(qIndex)" x-show="!q.isAnswered" :disabled="q.selectedAnswerIndex === null"
-                                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
-                                Check Answer
-                            </button>
-                            <div x-show="q.isAnswered" class="flex items-center space-x-2">
-                                <span :class="{'text-green-600': q.isCorrect, 'text-red-600': !q.isCorrect}" class="font-semibold text-lg">
-                                    <span x-text="q.isCorrect ? 'Correct!' : 'Incorrect.'"></span>
-                                </span>
-                            </div>
-                        </div>
-                        <div x-show="q.isAnswered" x-cloak x-transition class="mt-4 p-4 rounded-lg text-sm"
+                        <div x-show="quizSubmitted" x-cloak x-transition class="mt-4 p-4 rounded-lg text-sm"
                             :class="{'bg-green-50 border border-green-200 text-green-800': q.isCorrect, 'bg-red-50 border border-red-200 text-red-800': !q.isCorrect}">
                             <p class="font-semibold mb-1">Explanation:</p>
                             <p x-text="q.explanation"></p>
                         </div>
                     </div>
                 </template>
-
-                <div x-show="quizSubmitted" x-cloak class="card text-center p-6 bg-blue-50 border border-blue-200">
-                    <h3 class="text-2xl font-bold text-blue-800 mb-4">Quiz Results</h3>
-                    <p class="text-xl text-slate-700">You scored <span class="font-bold text-blue-600" x-text="`${quizScore} out of ${quizQuestions.length}`"></span>!</p>
-                    <p class="mt-4 text-slate-600">Review the explanations for any questions you missed to deepen your understanding.</p>
-                </div>
-                <div class="text-center mt-8">
-                    <button @click="calculateQuizScore()" x-show="!quizSubmitted && quizQuestions.every(q => q.isAnswered)"
-                        class="px-8 py-3 bg-indigo-600 text-white rounded-md text-lg font-semibold hover:bg-indigo-700 transition-colors duration-200">
-                        Submit Quiz
-                    </button>
-                </div>
             </div>
         </section>
 
-        <!-- Section 3: SDE in Practice -->
+        <!-- Section 3: SDE in Practice (Interactive Calculator) -->
         <section id="how" class="py-16">
             <h2 class="section-title">SDE in Practice: The Interactive Calculator</h2>
             <p class="section-intro">
@@ -358,52 +383,119 @@
                             <p class="text-sm text-slate-600 mb-2">Notice how overlooking even one add-back, like the <strong x-text="pnl.find(i => i.id === 'car').label"></strong>, would reduce the valuation by <strong x-text="formatCurrency(pnl.find(i => i.id === 'car').amount * valuationMultiple)"></strong> at the current multiple.</p>
                         </div>
                     </div>
-
-                    <!-- New Quantitative Questions for Valuation Impact -->
-                    <div class="card mt-8">
-                        <h3 class="text-xl font-bold mb-4 text-slate-800">Quantitative Impact Questions</h3>
-                        <p class="text-slate-600 mb-6">Test your understanding of how specific add-back decisions directly affect SDE and valuation.</p>
-                        <template x-for="(q, qIndex) in quantitativeQuestions" :key="qIndex">
-                            <div class="mb-6">
-                                <p class="font-semibold text-lg mb-3 text-slate-800" x-text="`${qIndex + 1}. ${q.question}`"></p>
-                                <div class="space-y-2">
-                                    <template x-for="(option, oIndex) in q.options" :key="oIndex">
-                                        <label class="flex items-center p-3 rounded-lg cursor-pointer transition-colors duration-200"
-                                            :class="{
-                                                'bg-blue-50 text-blue-800': q.selectedAnswerIndex === oIndex && !q.isAnswered,
-                                                'bg-green-50 text-green-800 font-medium': q.isAnswered && q.correctAnswerIndex === oIndex,
-                                                'bg-red-50 text-red-800 font-medium': q.isAnswered && q.selectedAnswerIndex === oIndex && q.selectedAnswerIndex !== q.correctAnswerIndex,
-                                                'hover:bg-slate-50': !q.isAnswered
-                                            }">
-                                            <input type="radio" :name="`quantitative-question-${qIndex}`" :value="oIndex" x-model="q.selectedAnswerIndex" :disabled="q.isAnswered" class="mr-3">
-                                            <span x-text="option"></span>
-                                        </label>
-                                    </template>
-                                </div>
-                                <div class="mt-4 flex justify-between items-center">
-                                    <button @click="checkQuantitativeAnswer(qIndex)" x-show="!q.isAnswered" :disabled="q.selectedAnswerIndex === null"
-                                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
-                                        Check Answer
-                                    </button>
-                                    <div x-show="q.isAnswered" class="flex items-center space-x-2">
-                                        <span :class="{'text-green-600': q.isCorrect, 'text-red-600': !q.isCorrect}" class="font-semibold text-lg">
-                                            <span x-text="q.isCorrect ? 'Correct!' : 'Incorrect.'"></span>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div x-show="q.isAnswered" x-cloak x-transition class="mt-3 p-3 rounded-lg text-sm"
-                                    :class="{'bg-green-50 border border-green-200 text-green-800': q.isCorrect, 'bg-red-50 border border-red-200 text-red-800': !q.isCorrect}">
-                                    <p class="font-semibold mb-1">Explanation:</p>
-                                    <p x-text="q.explanation"></p>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- New Section for Quantitative Questions -->
+        <section id="quantitative-quiz" class="py-16 bg-slate-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 mt-16">
+            <h2 class="section-title">Quantitative Impact Analysis: Test Your Application</h2>
+            <p class="section-intro">
+                Now, apply your understanding to specific scenarios. Answer these questions to assess your ability to quantify how add-back decisions directly affect SDE and business valuation.
+            </p>
+            <div class="max-w-3xl mx-auto space-y-8">
+                <template x-for="(q, qIndex) in quantitativeQuestions" :key="qIndex">
+                    <div class="card">
+                        <p class="font-semibold text-lg mb-3 text-slate-800" x-text="`${qIndex + 1}. ${q.question}`"></p>
+                        <div class="space-y-2">
+                            <template x-for="(option, oIndex) in q.options" :key="oIndex">
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer transition-colors duration-200"
+                                    :class="{
+                                        'bg-blue-50 text-blue-800': q.selectedAnswerIndex === oIndex && !quizSubmitted,
+                                        'bg-green-50 text-green-800 font-medium': quizSubmitted && q.correctAnswerIndex === oIndex,
+                                        'bg-red-50 text-red-800 font-medium': quizSubmitted && q.selectedAnswerIndex === oIndex && q.selectedAnswerIndex !== q.correctAnswerIndex,
+                                        'hover:bg-slate-50': !quizSubmitted
+                                    }">
+                                    <input type="radio" :name="`quantitative-question-${qIndex}`" :value="oIndex" x-model="q.selectedAnswerIndex" :disabled="quizSubmitted" class="mr-3">
+                                    <span x-text="option"></span>
+                                </label>
+                            </template>
+                        </div>
+                        <div x-show="quizSubmitted" x-cloak x-transition class="mt-3 p-3 rounded-lg text-sm"
+                            :class="{'bg-green-50 border border-green-200 text-green-800': q.isCorrect, 'bg-red-50 border border-red-200 text-red-800': !q.isCorrect}">
+                            <p class="font-semibold mb-1">Explanation:</p>
+                            <p x-text="q.explanation"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+        
+        <!-- Centralized Submit Quiz Button -->
+        <div class="text-center mt-8">
+            <button @click="submitQuiz()" :disabled="!allQuestionsAnswered || quizSubmitted"
+                class="px-8 py-3 bg-indigo-600 text-white rounded-md text-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+                Submit Quiz
+            </button>
+        </div>
+
     </main>
+
+    <footer class="bg-slate-800 text-slate-300 py-8 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm space-y-2">
+            <p>&copy; 2023 SDE Interactive Guide. All rights reserved.</p>
+            <p>Content Reviewed By: **Emily Reed, CPA, MBA**</p>
+            <p>Last Updated: July 14, 2025</p>
+            <p class="text-xs text-slate-400">
+                Disclaimer: This guide is for educational purposes only and should not be considered financial, legal, or investment advice. Always consult with a qualified professional for personalized guidance regarding your specific financial situation or business valuation needs.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Score Overlay -->
+    <div x-show="showScoreOverlay" x-cloak x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        class="overlay" @click.self="closeScoreOverlay()">
+        <div class="overlay-content">
+            <button class="overlay-close-button" @click="closeScoreOverlay()">
+                &times;
+            </button>
+            <h3 class="text-3xl font-bold text-blue-800 mb-4">Quiz Results!</h3>
+            <p class="text-xl text-slate-700 mb-6">You scored <span class="font-bold text-blue-600" x-text="`${quizScore} out of ${quizQuestions.length + quantitativeQuestions.length}`"></span> correct answers!</p>
+            <p class="text-slate-600">Review the explanations provided for each question to deepen your understanding.</p>
+        </div>
+    </div>
+
+    <!-- Meet Our Expert Modal -->
+    <div x-show="showExpertModal" x-cloak x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        class="overlay" @click.self="closeExpertModal()">
+        <div class="overlay-content">
+            <button class="overlay-close-button" @click="closeExpertModal()">
+                &times;
+            </button>
+            <h3 class="text-3xl font-bold text-blue-800 mb-4">Meet Our Expert</h3>
+            <img src="https://cloudinary.hbs.edu/hbsit/image/fetch/q_auto,c_fill,ar_1:1,g_west/f_webp/https%3A%2F%2Fimages.ctfassets.net%2Fbeh2ph2tgbqk%2F1yivGJqvZoXH8FZka0FpDZ%2F95d2c1d242b4697de385391b97679f3d%2Fsasael.jpg" alt="Expert Profile" class="rounded-full mx-auto mb-4 border-4 border-blue-200">
+            <h4 class="text-2xl font-semibold text-slate-800 mb-2">Emily Reed, CPA, MBA</h4>
+            <p class="text-slate-600 mb-4">
+                Emily is a Certified Public Accountant (CPA) with an MBA in Finance and over 15 years of experience in small business valuation and financial consulting. She has meticulously reviewed the content of this guide to ensure its accuracy, clarity, and adherence to industry best practices in SDE calculation and analysis.
+            </p>
+            <p class="text-sm text-slate-500">
+                Her expertise helps ensure that learners receive reliable and actionable financial knowledge.
+            </p>
+        </div>
+    </div>
+
+    <!-- Welcome Overlay (New) -->
+    <div x-show="showWelcomeOverlay" x-cloak x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        class="overlay">
+        <div class="overlay-content max-w-lg">
+            <h3 class="text-3xl font-bold text-blue-800 mb-4">Welcome to the ETA Knowledge Lab!</h3>
+            <p class="text-slate-700 mb-6">
+                Congratulations on taking the next step in your Entrepreneurship Through Acquisition (ETA) journey! This platform is designed for those who have already familiarized themselves with the foundational concepts of business buying through business school, networking, and key readings like the <a href="#" class="text-blue-600 hover:underline">Stanford Primer</a>, <a href="#" class="text-blue-600 hover:underline">Buy Then Build</a>, and the <a href="#" class="text-blue-600 hover:underline">HBR Guide to Buying a Small Business</a>.
+            </p>
+            <p class="text-slate-700 mb-6">
+                It's one thing to read about a concept; it's another to truly understand it. Our interactive modules are built to **test your existing knowledge for depth of understanding**, providing practical application scenarios that challenge your grasp of critical topics.
+            </p>
+            <p class="text-slate-700 mb-8">
+                This module focuses on **Seller's Discretionary Earnings (SDE)**, the first of many essential concepts we'll cover to sharpen your acquisition skills.
+            </p>
+            <button @click="hideWelcomeOverlay()" class="px-8 py-3 bg-indigo-600 text-white rounded-md text-lg font-semibold hover:bg-indigo-700 transition-colors duration-200">
+                Help Me Acquire!
+            </button>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script>
@@ -425,7 +517,8 @@
                 { label: 'Miscellaneous Office Supplies', amount: -5000 },
                 { label: 'Operating Income (EBIT)', amount: 106900, isHeader: true },
                 { id: 'interest', label: 'Interest Expense', amount: -4000, isAddBackOption: true, checked: true, addBackValue: 4000 },
-                { id: 'tax', label: 'Income Tax Expense', amount: -25725, isAddBackOption: true, checked: true, addBackValue: 25725 },
+                // Income Tax Expense is NOT an SDE add-back as SDE is a pre-tax metric.
+                { id: 'tax', label: 'Income Tax Expense', amount: -25725, isAddBackOption: false, checked: false, addBackValue: 0 }, 
                 { label: 'Net Income', amount: 77175, isHeader: true },
             ]
         };
@@ -438,125 +531,18 @@
                 calculatedSDE: 0,
                 valuationMultiple: 3.0,
                 sdeChart: null,
-                quizQuestions: [
-                    {
-                        question: "Why is Seller's Discretionary Earnings (SDE) often preferred over Net Income for valuing small, owner-operated businesses?",
-                        options: [
-                            "SDE is a GAAP-compliant metric for all business sizes.",
-                            "SDE provides a clearer picture of the total economic benefit to a single owner-operator.",
-                            "Net Income includes too many non-cash expenses, making it less reliable.",
-                            "SDE is solely used by sellers to inflate their business value."
-                        ],
-                        correctAnswerIndex: 1,
-                        selectedAnswerIndex: null,
-                        isAnswered: false,
-                        isCorrect: false,
-                        explanation: "SDE normalizes earnings to show the total cash flow available to a single owner-operator, accounting for discretionary expenses and owner compensation that obscure true profitability in Net Income for small businesses."
-                    },
-                    {
-                        question: "Which of the following would be considered a legitimate 'add-back' when calculating SDE?",
-                        options: [
-                            "Regular employee salaries and wages.",
-                            "Cost of goods sold.",
-                            "The owner's personal car payment expensed through the business.",
-                            "Monthly rent for the business premises."
-                        ],
-                        correctAnswerIndex: 2,
-                        selectedAnswerIndex: null,
-                        isAnswered: false,
-                        isCorrect: false,
-                        explanation: "The owner's personal car payment, if expensed through the business, is a discretionary item that would not be incurred by a new owner, hence it's added back to SDE."
-                    },
-                    {
-                        question: "A business incurs a significant, one-time legal fee for defending a lawsuit unrelated to its core operations. How would this expense typically be treated in an SDE calculation?",
-                        options: [
-                            "It would be subtracted from Net Income as a normal operating expense.",
-                            "It would be ignored entirely as it's not a recurring cost.",
-                            "It would be added back to Net Income as a non-recurring expense.",
-                            "It would be capitalized as an asset."
-                        ],
-                        correctAnswerIndex: 2,
-                        selectedAnswerIndex: null,
-                        isAnswered: false,
-                        isCorrect: false,
-                        explanation: "One-time, non-recurring expenses like a lawsuit settlement are added back to SDE to show the normalized, ongoing profitability of the business."
-                    },
-                    {
-                        question: "If a business has a Net Income of $100,000, and the owner's salary (expensed through the business) is $70,000, with no other add-backs, what is the SDE?",
-                        options: [
-                            "$30,000",
-                            "$100,000",
-                            "$170,000",
-                            "$240,000"
-                        ],
-                        correctAnswerIndex: 2,
-                        selectedAnswerIndex: null,
-                        isAnswered: false,
-                        isCorrect: false,
-                        explanation: "SDE = Net Income + Owner's Salary = $100,000 + $70,000 = $170,000. Owner's salary is a primary add-back."
-                    },
-                    {
-                        question: "A business has an SDE of $200,000. If comparable businesses in the industry are selling for a 3x SDE multiple, what is the estimated valuation of this business?",
-                        options: [
-                            "$200,000",
-                            "$400,000",
-                            "$600,000",
-                            "$800,000"
-                        ],
-                        correctAnswerIndex: 2,
-                        selectedAnswerIndex: null,
-                        isAnswered: false,
-                        isCorrect: false,
-                        explanation: "Estimated Valuation = SDE × Multiple = $200,000 × 3 = $600,000."
-                    },
-                    {
-                        question: "Which of the following statements best describes the purpose of 'discretionary expenses' as an SDE add-back?",
-                        options: [
-                            "To account for all operational costs of the business.",
-                            "To include all non-cash expenses like depreciation.",
-                            "To normalize earnings by removing costs that a new owner would not necessarily incur.",
-                            "To reduce the taxable income of the business."
-                        ],
-                        correctAnswerIndex: 2,
-                        selectedAnswerIndex: null,
-                        isAnswered: false,
-                        isCorrect: false,
-                        explanation: "Discretionary expenses are added back to remove costs that are personal to the current owner and would not be part of the business's ongoing operations under a new owner, thereby normalizing earnings."
-                    }
-                ],
-                quantitativeQuestions: [
-                    {
-                        question: "Using The Daily Grind's P&L, if the 'Owner's Salary' ($80,000) was *incorrectly* NOT added back to SDE (while all other default add-backs remain), what would be the resulting SDE?",
-                        options: ["", "", "", ""], // Placeholders
-                        correctAnswerIndex: null,
-                        selectedAnswerIndex: null,
-                        isAnswered: false,
-                        isCorrect: false,
-                        explanation: "If Owner's Salary is not added back, the SDE would be reduced by that amount. Original SDE (with all default add-backs) is $150,000. $150,000 - $80,000 = $70,000."
-                    },
-                    {
-                        question: "Given the current 'Calculated SDE' and 'Valuation Multiple' in the calculator above, if you *mistakenly* added back a non-discretionary expense of $10,000 (e.g., regular employee training), how much would this *incorrectly* inflate the estimated valuation?",
-                        options: ["", "", "", ""], // Placeholders
-                        correctAnswerIndex: null,
-                        selectedAnswerIndex: null,
-                        isAnswered: false,
-                        isCorrect: false,
-                        explanation: "An incorrect add-back of $10,000 would inflate SDE by $10,000. At a 3x multiple, this inflates valuation by $10,000 * 3 = $30,000."
-                    },
-                    {
-                        question: "If 'The Daily Grind' had no owner's salary, no personal car lease, and no personal travel expenses, but all other default add-backs (Depreciation, Legal Fees, Interest, Taxes) were valid, what would be the SDE?",
-                        options: ["", "", "", ""], // Placeholders
-                        correctAnswerIndex: null,
-                        selectedAnswerIndex: null,
-                        isAnswered: false,
-                        isCorrect: false,
-                        explanation: "SDE = Net Income + Depreciation + Legal Fees + Interest + Taxes = $77,175 + $10,000 + $7,500 + $4,000 + $25,725 = $124,400."
-                    }
-                ],
                 quizScore: 0,
                 quizSubmitted: false,
-
+                showScoreOverlay: false, // New property for overlay visibility
+                showExpertModal: false, // New property for expert modal visibility
+                showWelcomeOverlay: false, // Control for welcome overlay
+                
                 init() {
+                    // Check local storage to see if the welcome overlay has been seen
+                    if (localStorage.getItem('hasSeenWelcome') !== 'true') {
+                        this.showWelcomeOverlay = true;
+                    }
+
                     this.$nextTick(() => {
                         this.calculateSDE();
                         this.createChart();
@@ -574,7 +560,9 @@
                     let currentTotalAddBacks = 0;
                     
                     this.pnl.forEach(item => {
-                        if (item.isAddBackOption && item.checked) {
+                        // Only add back if it's an add-back option AND it's checked in the UI
+                        // Also, ensure 'tax' is never added back for SDE, regardless of checkbox state, as SDE is pre-tax.
+                        if (item.isAddBackOption && item.checked && item.id !== 'tax') {
                             currentTotalAddBacks += item.addBackValue;
                         }
                     });
@@ -641,32 +629,62 @@
                     }
                 },
 
-                checkAnswer(qIndex) {
-                    let q = this.quizQuestions[qIndex];
-                    if (q.selectedAnswerIndex !== null) {
-                        q.isAnswered = true;
-                        q.isCorrect = (q.selectedAnswerIndex === q.correctAnswerIndex);
-                    }
-                },
+                submitQuiz() {
+                    if (!this.allQuestionsAnswered) return; // Prevent submission if not all answered
 
-                calculateQuizScore() {
-                    this.quizScore = this.quizQuestions.filter(q => q.isCorrect).length;
+                    this.quizScore = 0;
+                    // Check main quiz questions
+                    this.quizQuestions.forEach(q => {
+                        if (q.selectedAnswerIndex !== null) {
+                            q.isCorrect = (Number(q.selectedAnswerIndex) === q.correctAnswerIndex);
+                            // Set isAnswered to true for all questions after submission
+                            q.isAnswered = true; 
+                            if (q.isCorrect) {
+                                this.quizScore++;
+                            }
+                        }
+                    });
+                    // Check quantitative questions
+                    this.quantitativeQuestions.forEach(q => {
+                        if (q.selectedAnswerIndex !== null) {
+                            q.isCorrect = (Number(q.selectedAnswerIndex) === q.correctAnswerIndex);
+                            // Set isAnswered to true for all questions after submission
+                            q.isAnswered = true;
+                            if (q.isCorrect) {
+                                this.quizScore++;
+                            }
+                        }
+                    });
                     this.quizSubmitted = true;
+                    this.showScoreOverlay = true; // Show the score overlay
                 },
 
-                // New functions for quantitative questions
+                // Computed property to check if all questions have been answered
+                get allQuestionsAnswered() {
+                    const mainQuizAnswered = this.quizQuestions.every(q => q.selectedAnswerIndex !== null);
+                    const quantitativeQuizAnswered = this.quantitativeQuestions.every(q => q.selectedAnswerIndex !== null);
+                    return mainQuizAnswered && quantitativeQuizAnswered;
+                },
+
+                // Quantitative questions now also use the submitQuiz flow
                 initializeQuantitativeQuestions() {
                     // Q1: SDE if Owner's Salary is NOT added back
                     const q1_netIncome = 77175;
-                    const q1_addbacks_without_salary_value = (9600 + 10000 + 7500 + 18000 + 4000 + 25725); // Car, Dep, Legal, Travel, Interest, Tax
-                    const q1_sde_result = q1_netIncome + q1_addbacks_without_salary_value;
+                    // Add-backs for Q1 (excluding salary and tax)
+                    const q1_addbacks_value = pnlData.items.filter(item => 
+                        item.isAddBackOption && item.id !== 'salary' && item.id !== 'tax'
+                    ).reduce((sum, item) => sum + item.addBackValue, 0);
+                    const q1_sde_result = q1_netIncome + q1_addbacks_value;
+
                     this.quantitativeQuestions[0].options = [
                         this.formatCurrency(q1_sde_result),
-                        this.formatCurrency(q1_sde_result + 80000), // Incorrect: adding salary back
+                        this.formatCurrency(q1_sde_result + pnlData.items.find(i => i.id === 'salary').addBackValue), // Incorrect: adding salary back
                         this.formatCurrency(q1_netIncome), // Incorrect: just net income
-                        this.formatCurrency(q1_netIncome - 80000) // Incorrect: subtracting salary
+                        this.formatCurrency(q1_netIncome - pnlData.items.find(i => i.id === 'salary').addBackValue) // Incorrect: subtracting salary
                     ];
                     this.quantitativeQuestions[0].correctAnswerIndex = 0;
+                    this.quantitativeQuestions[0].explanation = `If Owner's Salary is not added back, SDE would be Net Income + other valid add-backs (Depreciation, Car Lease, Legal Fees, Travel, Interest) = $${q1_netIncome} + $${q1_addbacks_value} = ${this.formatCurrency(q1_sde_result)}.`;
+
 
                     // Q2: Valuation impact of a $10,000 incorrect add-back
                     const q2_incorrect_addback_amount = 10000;
@@ -678,11 +696,16 @@
                         this.formatCurrency(0)
                     ];
                     this.quantitativeQuestions[1].correctAnswerIndex = 1;
+                    this.quantitativeQuestions[1].explanation = `An incorrect add-back of $${q2_incorrect_addback_amount} would inflate SDE by $${q2_incorrect_addback_amount}. At a ${this.valuationMultiple}x multiple, this incorrectly inflates valuation by $${q2_incorrect_addback_amount} * ${this.valuationMultiple} = ${this.formatCurrency(q2_impact)}.`;
 
-                    // Q3: SDE with specific add-backs excluded (no owner salary, car, travel)
+
+                    // Q3: SDE with specific add-backs excluded (no owner salary, car, travel, tax)
                     const q3_netIncome = 77175;
-                    const q3_addbacks_value = 10000 + 7500 + 4000 + 25725; // Dep, Legal, Interest, Tax
+                    const q3_addbacks_value = pnlData.items.filter(item => 
+                        item.isAddBackOption && !['salary', 'car', 'travel', 'tax'].includes(item.id)
+                    ).reduce((sum, item) => sum + item.addBackValue, 0);
                     const q3_sde_result = q3_netIncome + q3_addbacks_value;
+
                     this.quantitativeQuestions[2].options = [
                         this.formatCurrency(q3_sde_result),
                         this.formatCurrency(q3_netIncome),
@@ -690,14 +713,19 @@
                         this.formatCurrency(q3_netIncome + 10000 + 7500) // Incorrect partial add-backs
                     ];
                     this.quantitativeQuestions[2].correctAnswerIndex = 0;
+                    this.quantitativeQuestions[2].explanation = `If only Depreciation, Legal Fees, and Interest are added back (excluding Owner's Salary, Car Lease, Travel, and Tax), SDE would be Net Income + Depreciation + Legal Fees + Interest = $${q3_netIncome} + $${q3_addbacks_value} = ${this.formatCurrency(q3_sde_result)}.`;
                 },
 
-                checkQuantitativeAnswer(qIndex) {
-                    let q = this.quantitativeQuestions[qIndex];
-                    if (q.selectedAnswerIndex !== null) {
-                        q.isAnswered = true;
-                        q.isCorrect = (q.selectedAnswerIndex === q.correctAnswerIndex);
-                    }
+                closeScoreOverlay() {
+                    this.showScoreOverlay = false;
+                },
+                closeExpertModal() { // New function to close expert modal
+                    this.showExpertModal = false;
+                },
+                // New function to hide the welcome overlay and set local storage
+                hideWelcomeOverlay() {
+                    this.showWelcomeOverlay = false;
+                    localStorage.setItem('hasSeenWelcome', 'true');
                 }
             }
         }
