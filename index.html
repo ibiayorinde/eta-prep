@@ -178,7 +178,7 @@
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex-shrink-0">
-                    <h1 class="text-xl font-bold text-slate-800">SDE Interactive Guide</h1>
+                    <h1 class="text-xl font-bold text-slate-800">ETA University</h1>
                 </div>
                 <div class="hidden md:flex md:space-x-4">
                     <a href="#why" class="nav-link">Why SDE Matters</a>
@@ -485,12 +485,12 @@
         <div class="overlay-content max-w-lg">
             <div x-show="welcomeSlide === 1" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                  x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-                <h3 class="text-3xl font-bold text-blue-800 mb-4">Welcome to the ETA Knowledge Lab!</h3>
+                <h3 class="text-3xl font-bold text-blue-800 mb-4">Welcome to ETA University!</h3>
                 <p class="text-slate-700 mb-6">
-                    Congratulations on taking the next step in your Entrepreneurship Through Acquisition (ETA) journey! This platform is designed for those who have already familiarized themselves with the foundational concepts of business buying through business school, networking, and key readings like the <a href="#" class="text-blue-600 hover:underline">Stanford Primer</a>, <a href="#" class="text-blue-600 hover:underline">Buy Then Build</a>, and the <a href="#" class="text-blue-600 hover:underline">HBR Guide to Buying a Small Business</a>.
+                    Congratulations on taking the next step in your business acquisition journey! This platform is designed to go a step beyond the foundational acquisition concepts covered in well-known resources like the <a href="https://www.gsb.stanford.edu/experience/about/centers-institutes/ces/research/search-funds/primer" class="text-blue-600 hover:underline">Stanford Primer</a>, <a href="https://www.amazon.com/Buy-Then-Build-Acquisition-Entrepreneurs/dp/1544501137/ref=sr_1_1?crid=3UYKOQ7WIW6TL&dib=eyJ2IjoiMSJ9.PZ1xD-5vJU867AdrzmI_SW3Cfu4UxfHCXzdMM8lfXnAkNibamgAHwulK7Q2fo2IGGD3qc4aiP65DM5BjGhEXkFR7KMxlTVQ0tL9itqRXA4YVMnBVqPDhbO4_ULg3NBkMooHFAU5pYFKT-xIUEwcIN2SX4O7Nz1krisDuylO6nG2pnvcwx5Be7zaRqLWnkE-5Ak3suJikDUxqTl9eZXqIZQ_gifVIfyGWXj0VObjNu_s.9aMpQmxbAicWN6ltyD0cY-q88_7z5IPZBV3HsEKCs3c&dib_tag=se&keywords=buy+then+build&qid=1752527134&s=books&sprefix=buy+then+build%2Cstripbooks%2C311&sr=1-1" class="text-blue-600 hover:underline">Buy Then Build</a>, and the <a href="https://www.amazon.com/HBR-Guide-Buying-Small-Business/dp/1633692507/ref=sr_1_1?crid=2CFDFYSH5U437&dib=eyJ2IjoiMSJ9.oj8gmSZ2aNHZb9X2Q7FO3A.7-sfoCEAZjrI6FvdU8LGa8AbXVCYT9fi06z2obcATlU&dib_tag=se&keywords=hbr+guide+to+buying+a+small+business+richard+ruback+%26+royce+yudkoff&qid=1752527164&sprefix=HBR+guide+to+buyin%2Caps%2C88&sr=8-1" class="text-blue-600 hover:underline">HBR Guide to Buying a Small Business</a>.
                 </p>
                 <p class="text-slate-700 mb-6">
-                    It's one thing to read about a concept; it's another to truly understand it. Our interactive modules are built to **test your existing knowledge for depth of understanding**, providing practical application scenarios that challenge your grasp of critical topics.
+                    Our interactive modules are built to test your existing knowledge for depth of understanding, providing practical application scenarios that challenge your grasp of critical topics.
                 </p>
                 <button @click="nextWelcomeSlide()" class="px-8 py-3 bg-indigo-600 text-white rounded-md text-lg font-semibold hover:bg-indigo-700 transition-colors duration-200">
                     Next
@@ -501,14 +501,14 @@
                  x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                 <h3 class="text-3xl font-bold text-blue-800 mb-4">Upcoming Topics</h3>
                 <p class="text-slate-700 mb-6">
-                    This module focuses on **Seller's Discretionary Earnings (SDE)**, the first of many essential concepts we'll cover to sharpen your acquisition skills. Here's a sneak peek at what's coming soon:
+                    This module focuses on Seller's Discretionary Earnings (SDE), the first of many essential concepts we'll cover to sharpen your acquisition skills. Here's a sneak peek at what's coming soon:
                 </p>
                 <ul class="list-disc list-inside text-left text-slate-700 mb-8 space-y-2">
-                    <li>**Due Diligence Deep Dive:** Uncovering hidden risks and opportunities.</li>
-                    <li>**Deal Structuring Strategies:** Crafting win-win agreements.</li>
-                    <li>**Financing Your Acquisition:** Navigating debt and equity options.</li>
-                    <li>**Post-Acquisition Integration:** Maximizing value after the close.</li>
-                    <li>**Legal & Regulatory Landscape:** Understanding compliance and contracts.</li>
+                    <li>Due Diligence Deep Dive:** Uncovering hidden risks and opportunities.</li>
+                    <li>Deal Structuring Strategies:** Crafting win-win agreements.</li>
+                    <li>Financing Your Acquisition:** Navigating debt and equity options.</li>
+                    <li>Post-Acquisition Integration:** Maximizing value after the close.</li>
+                    <li>Legal & Regulatory Landscape:** Understanding compliance and contracts.</li>
                 </ul>
                 <button @click="hideWelcomeOverlay()" class="px-8 py-3 bg-indigo-600 text-white rounded-md text-lg font-semibold hover:bg-indigo-700 transition-colors duration-200">
                     Help Me Acquire!
@@ -558,19 +558,67 @@
                 showWelcomeOverlay: true, // Control for welcome overlay - set to true by default
                 welcomeSlide: 1, // Current slide for the welcome overlay
                 
-                quizQuestions: [
+                quizQuestions: [                
                     {
-                        question: "Why is Seller's Discretionary Earnings (SDE) often preferred over Net Income for valuing small, owner-operated businesses?",
+                        question: "Seller's discretionary earnings ('SDE') is a metric that is commonly used amongst business buyers, brokers, and sellers. Which best describes SDE:",
                         options: [
-                            "SDE is a GAAP-compliant metric for all business sizes.",
-                            "SDE provides a clearer picture of the total economic benefit to a single owner-operator.",
-                            "Net Income includes too many non-cash expenses, making it less reliable.",
-                            "SDE is solely used by sellers to inflate their business value."
+                            "SDE is the total personal expenses incurred by a seller and expensed through the business in a given year",
+                            "SDE is a metric that closely represents the gross margins of a business",
+                            "SDE is an annual total of all business costs and expenses incurred.",
+                            "SDE represents annual operating cash flow produced by a business."
+                        ],
+                        correctAnswerIndex: 3,
+                        selectedAnswerIndex: null,
+                        explanation: "SDE is the estimated cash flow available to an owner-operator looking to acquire a business, normalized to account for discretionary expenses and compensation incurred by the Seller."
+                    },
+                    {
+                        question: "Why is Seller's Discretionary Earnings (SDE) often used over Net Income for valuing small, owner-operated businesses?",
+                        options: [
+                            "SDE is a GAAP-compliant metric that can be used for all business sizes and is approved by most lenders.",
+                            "SDE provides a clearer picture of the total economic benefit available to a single owner-operator considering a business acquisition.",
+                            "Net Income includes cash and non-cash expenses that are specific to the existing owner, making it less reliable.",
+                            "Net Income is easily maniupulated and sellers often use it to inflate their business value."
                         ],
                         correctAnswerIndex: 1,
                         selectedAnswerIndex: null,
-                        explanation: "SDE normalizes earnings to show the total cash flow available to a single owner-operator, accounting for discretionary expenses and owner compensation that obscure true profitability in Net Income for small businesses."
+                        explanation: "SDE normalizes available cash flow by adding discretionary expenses, non-reucrring expenses, and owner compensation to the operating cash flow of a business. On the other hand, net income doesn't adjust for expenses that a new Buyer of a business won't incur."
                     },
+                    {
+                        question: "Why is it important for acquirers to normalize the cash flow of a business that is being sold?",
+                        options: [
+                            "To ensure the seller's reported profit margin aligns with industry benchmarks.",
+                            "To reveal the true earning power of the business by removing non-recurring, discretionary, or personal expenses that may distort profitability.",
+                            "To reduce tax liability for the buyer in the event of a stock purchase.",
+                            "To meet lender requirements for minimum EBITDA thresholds, regardless of the actual cash flow drivers of the business."
+                        ],
+                        correctAnswerIndex: 1,
+                        selectedAnswerIndex: null,
+                        explanation: "Normalizing cash flow allows the buyer to understand the true economic benefit the business generates for its owner. Sellers often include personal, discretionary, or one-time expenses in their financial statements—such as family members on payroll, one-off legal fees, or non-operating income—that don’t reflect the ongoing earning capacity of the business. By adjusting for these items, the acquirer can calculate Seller’s Discretionary Earnings (SDE), which provides a clearer picture of how much cash the business could generate under new ownership."
+                    },
+                    {
+                        question: "Which of the following best explains why a buyer might estimate higher cash flow than the seller, even if revenue stays the same?",
+                        options: [
+                            "The buyer may choose to pay themselves less than the seller did or eliminate discretionary expenses that are not essential to running the business.",
+                            "The buyer can capitalize certain recurring expenses, reducing how they appear on the income statement.",
+                            "The buyer may benefit from operational efficiencies that lower fixed costs, even if they haven't been implemented yet.",
+                            "The buyer may structure the deal in a tax-advantaged way that increases post-tax cash flow."
+                        ],
+                        correctAnswerIndex: 0,
+                        selectedAnswerIndex: null,
+                        explanation: "While tax structure and future efficiencies can impact value, normalizing cash flow focuses on adjustments to the current or historical financials to reflect how the business would perform under new ownership today. A buyer may estimate higher cash flow simply because they do not plan to continue certain seller-specific expenses—such as a high personal salary or discretionary spending. These choices do not rely on future improvements or accounting reclassifications; they represent realistic, immediate differences in ownership behavior that affect the business’s earnings power."
+                    },                                
+                    {
+                        question: "Of the following ways SDE can be used in a transaction, select which application is NOT a primary use.",
+                        options: [
+                            "SDE is a common measure of cash flows available to an owner and is used reliably to evaluate the competitive advantages of a business.",
+                            "A primary use of SDE is to allow buyers to compare the owner available cash flows of different targets on an apples-to-apples basis.",
+                            "Businesses are primarily valued using a multiple of earnings and SDE is the most common benchmark of earnings used to arrive at the valuation and purchase price of a business.",
+                            "Calculating SDE is an essential exercises for understanding and negotiating the various incomes and expenses that may, or may not, be appropriate to include the final valuation of the business."
+                        ],
+                        correctAnswerIndex: 0,
+                        selectedAnswerIndex: null,
+                        explanation: "SDE normalizes earnings to show the total cash flow available to a single owner-operator, accounting for discretionary expenses and owner compensation that obscure true profitability in Net Income for small businesses."
+                    },                    
                     {
                         question: "Which of the following would be considered a legitimate 'add-back' when calculating SDE?",
                         options: [
